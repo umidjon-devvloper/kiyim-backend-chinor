@@ -19,7 +19,10 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: "*",
+    origin: [
+      "https://checkout.test.paycom.uz",
+      "https://checkout.paycom.uz",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",

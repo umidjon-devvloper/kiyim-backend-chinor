@@ -1,17 +1,28 @@
 import { UserSubscription } from "../models/Subscription.js";
+import { TransactionState, PaymeError as PaymeErrorEnum } from "../enum/transaction.enum.js";
 import { PaymeError } from "../utils/errors.js";
 
-const STATE = {
-  Pending: 1,
-  Paid: 2,
-  PendingCanceled: -1,
-  PaidCanceled: -2,
-};
+// TransactionState dan foydalanamiz
+const STATE = TransactionState;
 export function buildPaymeUrl(subscriptionId, amountInTiyin) {
   const isTest = process.env.NODE_ENV !== "production";
   const baseUrl = isTest ? "https://checkout.test.paycom.uz" : "https://checkout.paycom.uz";
-  const params = { merchant: process.env.PAYME_MERCHANT_ID, amount: amountInTiyin, account: { subscription_id: subscriptionId.toString(), }, };
-  return `${baseUrl}/widget/${process.env.PAYME_WALLET_ID}?${new URLSearchParams(params)}`;
+  
+  // Payme rekvizitlari
+  const merchantId = process.env.PAYME_MERCHANT_ID;
+  
+  if (!merchantId) {
+    throw new Error("PAYME_MERCHANT_ID environment variable is not set");
+  }
+  
+  // Payme checkout URL formati
+  // https://checkout.paycom.uz/{merchant_id}?{params}
+  const params = new URLSearchParams();
+  params.append('merchant', merchantId);
+  params.append('amount', amountInTiyin.toString());
+  params.append('account[subscription_id]', subscriptionId.toString());
+  
+  return `${baseUrl}/${merchantId}?${params.toString()}`;
 }
 export const checkPerformTransaction = async ({ id, params }) => {
   const sub = await UserSubscription.findById(
