@@ -90,9 +90,19 @@ export const createTransaction = async ({ id, params }) => {
 };
 
 export const performTransaction = async ({ id, params }) => {
+  console.log('=== PerformTransaction Debug ===');
+  console.log('params.id:', params.id);
+  console.log('params:', JSON.stringify(params, null, 2));
+  
   const sub = await UserSubscription.findOne({
     paymeTransactionId: params.id,
   });
+  
+  console.log('Found subscription:', sub ? 'YES' : 'NO');
+  if (sub) {
+    console.log('sub.paymeTransactionId:', sub.paymeTransactionId);
+    console.log('sub.paymeState:', sub.paymeState);
+  }
 
   if (!sub) return PaymeError.transactionNotFound(id);
 
