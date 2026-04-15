@@ -18,9 +18,7 @@ const TransactionState = {
 // Payme checkout URL yaratish
 export function buildPaymeUrl(subscriptionId, amountInTiyin) {
   const isTest = process.env.NODE_ENV !== "production";
-  const baseUrl = isTest
-    ? "https://checkout.test.paycom.uz"
-    : "https://checkout.paycom.uz";
+  const baseUrl = "https://checkout.paycom.uz";
 
   const params = {
     merchant: process.env.PAYME_MERCHANT_ID,
