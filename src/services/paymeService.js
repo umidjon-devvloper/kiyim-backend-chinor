@@ -76,6 +76,8 @@ export const createTransaction = async ({ id, params }) => {
   
   console.log('Saved paymeTransactionId:', sub.paymeTransactionId);
   console.log('Saved paymeState:', sub.paymeState);
+  console.log('Response transaction:', sub._id.toString());
+  console.log('Response state:', STATE.Pending);
 
   return {
     id,
