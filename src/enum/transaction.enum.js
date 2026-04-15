@@ -1,13 +1,13 @@
-exports.PaymeMethod = {
+export const PaymeMethod = {
 	CheckPerformTransaction: 'CheckPerformTransaction',
 	CheckTransaction: 'CheckTransaction',
 	CreateTransaction: 'CreateTransaction',
 	PerformTransaction: 'PerformTransaction',
 	CancelTransaction: 'CancelTransaction',
 	GetStatement: 'GetStatement',
-}
+};
 
-exports.PaymeError = {
+export const PaymeError = {
 	InvalidAmount: {
 		name: 'InvalidAmount',
 		code: -31001,
@@ -80,16 +80,15 @@ exports.PaymeError = {
 			en: 'Authorization invalid',
 		},
 	},
-}
+};
 
-exports.PaymeData = {
-	UserId: 'user_id',
-	ProductId: 'product_id',
-}
+export const PaymeData = {
+	subscription_id: 'subscription_id',
+};
 
-exports.TransactionState = {
+export const TransactionState = {
 	Paid: 2,
 	Pending: 1,
 	PendingCanceled: -1,
 	PaidCanceled: -2,
-}
+};
