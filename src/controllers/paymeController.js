@@ -1,41 +1,38 @@
-// Docs loyihasiga to'liq mos: switch(method) pattern
-import {
-  checkPerformTransaction,
-  createTransaction,
-  performTransaction,
-  cancelTransaction,
-  checkTransaction,
-  getStatement,
-} from "../services/paymeService.js";
+import * as service from "../services/paymeService.js";
 import { PaymeError } from "../utils/errors.js";
 
-const METHODS = {
-  CheckPerformTransaction: checkPerformTransaction,
-  CreateTransaction:       createTransaction,
-  PerformTransaction:      performTransaction,
-  CancelTransaction:       cancelTransaction,
-  CheckTransaction:        checkTransaction,
-  GetStatement:            getStatement,
-};
+export const handlePayme = async (req, res) => {
+  const { method, params, id } = req.body;
 
-export const handlePayme = async (req, res, next) => {
-  try {
-    const { id, method, params } = req.body;
+  let result;
 
-    if (!method) {
-      return res.json(PaymeError.parse(id || null));
-    }
+  switch (method) {
+    case "CheckPerformTransaction":
+      result = await service.checkPerformTransaction({ id, params });
+      break;
 
-    const handler = METHODS[method];
-    if (!handler) {
-      return res.json(PaymeError.methodNotFound(id));
-    }
+    case "CreateTransaction":
+      result = await service.createTransaction({ id, params });
+      break;
 
-    const result = await handler({ id, params });
-    return res.json(result);
-  } catch (error) {
-    console.error("Payme error:", error);
-    const { id } = req.body || {};
-    return res.json(PaymeError.internalError(id || null));
+    case "PerformTransaction":
+      result = await service.performTransaction({ id, params });
+      break;
+
+    case "CancelTransaction":
+      result = await service.cancelTransaction({ id, params });
+      break;
+
+    case "CheckTransaction":
+      result = await service.checkTransaction({ id, params });
+      break;
+
+    default:
+      result = PaymeError.methodNotFound(id);
   }
+
+  res.json({
+    jsonrpc: "2.0",
+    ...result,
+  });
 };

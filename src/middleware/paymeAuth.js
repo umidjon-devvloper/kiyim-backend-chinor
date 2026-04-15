@@ -1,46 +1,19 @@
-// Docs loyihasiga mos: PAYME_MERCHANT_KEY ni base64 token ichida qidiradi
-// Payme serveri: Authorization: Basic base64("Paycom:<MERCHANT_KEY>")
-
 export const paymeAuth = (req, res, next) => {
-  try {
-    const { id } = req.body;
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
+  const auth = req.headers["authorization"];
 
-    if (!token) {
-      return res.json({
-        id,
-        error: {
-          code: -32504,
-          message: {
-            uz: "Avtorizatsiya yaroqsiz",
-            ru: "Авторизация недействительна",
-            en: "Authorization invalid",
-          },
-        },
-      });
-    }
+  if (!auth) return res.status(401).send("Unauthorized");
 
-    const decoded = Buffer.from(token, "base64").toString("utf8");
+  const base64 = auth.split(" ")[1];
+  const decoded = Buffer.from(base64, "base64").toString();
 
-    const PAYME_MERCHANT_KEY = process.env.PAYME_MERCHANT_KEY;
+  const [login, password] = decoded.split(":");
 
-    if (!decoded.includes(PAYME_MERCHANT_KEY)) {
-      return res.json({
-        id,
-        error: {
-          code: -32504,
-          message: {
-            uz: "Avtorizatsiya yaroqsiz",
-            ru: "Авторизация недействительна",
-            en: "Authorization invalid",
-          },
-        },
-      });
-    }
-
-    next();
-  } catch (err) {
-    next(err);
+  if (
+    login !== "Paycom" ||
+    password !== process.env.PAYME_KEY
+  ) {
+    return res.status(401).send("Unauthorized");
   }
+
+  next();
 };
