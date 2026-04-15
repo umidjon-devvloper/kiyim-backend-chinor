@@ -1,5 +1,6 @@
 import { UserSubscription } from "../models/Subscription.js";
-import { TransactionState, PaymeError  } from "../enum/transaction.enum.js";
+import { TransactionState } from "../enum/transaction.enum.js";
+import { PaymeError } from "../utils/errors.js";
 
 // TransactionState dan foydalanamiz
 const STATE = TransactionState;
