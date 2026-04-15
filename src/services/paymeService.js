@@ -35,6 +35,16 @@ export const checkPerformTransaction = async ({ id, params }) => {
     return PaymeError.wrongAmount(id);
   }
 
+  // Agar obuna allaqachon pending bo'lsa, boshqa tranzaksiya yaratish mumkin emas
+  if (sub.paymeState === STATE.Pending && sub.paymeTransactionId) {
+    return PaymeError.cantDoOperation(id);
+  }
+
+  // Agar obuna allaqachon to'langan bo'lsa
+  if (sub.paymeState === STATE.Paid) {
+    return PaymeError.alreadyDone(id);
+  }
+
   // Payme spec: result = { allow: boolean }
   return { 
     id, 
@@ -52,6 +62,16 @@ export const createTransaction = async ({ id, params }) => {
   );
 
   if (!sub) return PaymeError.orderNotFound(id);
+
+  // Agar obuna allaqachon pending bo'lsa, xato qaytarish
+  if (sub.paymeState === STATE.Pending && sub.paymeTransactionId) {
+    return PaymeError.pending(id);
+  }
+
+  // Agar obuna allaqachon to'langan bo'lsa
+  if (sub.paymeState === STATE.Paid) {
+    return PaymeError.alreadyDone(id);
+  }
 
   sub.paymeTransactionId = paymeId;
   sub.paymeState = STATE.Pending;
