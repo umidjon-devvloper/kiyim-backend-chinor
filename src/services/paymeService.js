@@ -51,6 +51,11 @@ export const checkPerformTransaction = async ({ id, params }) => {
 
 export const createTransaction = async ({ id, params }) => {
   const { id: paymeId, time } = params;
+  
+  console.log('=== CreateTransaction Debug ===');
+  console.log('paymeId:', paymeId);
+  console.log('time:', time);
+  console.log('subscription_id:', params.account?.subscription_id);
 
   const sub = await UserSubscription.findById(
     params.account.subscription_id
@@ -68,6 +73,9 @@ export const createTransaction = async ({ id, params }) => {
   sub.paymeCreateTime = time;
 
   await sub.save();
+  
+  console.log('Saved paymeTransactionId:', sub.paymeTransactionId);
+  console.log('Saved paymeState:', sub.paymeState);
 
   return {
     id,
