@@ -35,7 +35,13 @@ export const checkPerformTransaction = async ({ id, params }) => {
     return PaymeError.wrongAmount(id);
   }
 
-  return { id, result: { allow: true } };
+  // Payme spec: result = { allow: boolean }
+  return { 
+    id, 
+    result: { 
+      allow: true 
+    } 
+  };
 };
 
 export const createTransaction = async ({ id, params }) => {
