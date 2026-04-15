@@ -15,7 +15,7 @@ async function connectDB() {
     cached.promise = mongoose.connect(MONGODB_URI).then((mongoose) => mongoose);
     console.log("Connected to MongoDB");
   }
-
+  console.log("Using cached connection");
   cached.conn = await cached.promise;
   return cached.conn;
 }
