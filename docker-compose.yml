@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: kiyim_mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: kiyim_dizayn
+    networks:
+      - kiyim_net
+
+  app:
+    build: .
+    container_name: kiyim_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/kiyim_dizayn
+    depends_on:
+      - mongo
+    networks:
+      - kiyim_net
+    volumes:
+      - ./src:/app/src
+
+volumes:
+  mongo_data:
+
+networks:
+  kiyim_net:
+    driver: bridge
