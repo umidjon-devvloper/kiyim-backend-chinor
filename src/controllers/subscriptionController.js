@@ -85,7 +85,7 @@ export const getMySubscription = async (req, res, next) => {
       subscription: null,
       daysLeft: 0,
       pendingSubscription: pendingSub ? {
-        _id: pendingSub._id,
+        _id: pendingSub._id.toString(),
         plan: pendingSub.plan,
         amount: pendingSub.amount,
         createdAt: pendingSub.createdAt,
