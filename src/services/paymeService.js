@@ -3,99 +3,110 @@ import { UserSubscription } from "../models/Subscription.js";
 import { Transaction } from "../models/Transaction.js";
 import { TransactionState, PaymeError } from "../enum/transaction.enum.js";
 
-// TransactionState dan foydalanamiz
 const STATE = TransactionState;
+
+// ================================
+// 🔗 PAYME URL
+// ================================
 export function buildPaymeUrl(subscriptionId, amountInTiyin) {
   const merchantId = process.env.PAYME_MERCHANT_ID;
 
-  const params = {
-    m: merchantId,
-    ac: { subscription_id: subscriptionId.toString() },
-    a: amountInTiyin, // 1000000 — tiyin ✅
-  };
+  if (!merchantId || merchantId.length !== 24) {
+    throw new Error("PAYME_MERCHANT_ID noto‘g‘ri");
+  }
 
-  const encoded = Buffer.from(JSON.stringify(params)).toString("base64");
-  return `https://checkout.paycom.uz/${encoded}`;
+  const subId =
+    typeof subscriptionId === "string"
+      ? subscriptionId
+      : subscriptionId.toString();
+
+  const amount = Math.round(Number(amountInTiyin));
+
+  if (!Number.isInteger(amount) || amount <= 0) {
+    throw new Error("Amount noto‘g‘ri");
+  }
+
+  // 🔥 PAYME DOCS FORMAT
+  const params = `m=${merchantId};ac.subscription_id=${subId};a=${amount}`;
+
+  console.log("RAW PARAMS:", params);
+
+  const encoded = Buffer.from(params, "utf-8").toString("base64");
+
+  const url = `https://checkout.paycom.uz/${encoded}`;
+
+  console.log("FINAL URL:", url);
+
+  return url;
 }
 
+// ================================
+// ✅ CHECK PERFORM
+// ================================
 export const checkPerformTransaction = async ({ id, params }) => {
-  // subscription_id valid ObjectId emasmi?
-  console.log("Checking PerformTransaction with params:", params);
-  if (!mongoose.Types.ObjectId.isValid(params.account.subscription_id)) {
+  const subId = params.account?.subscription_id;
+
+  if (!mongoose.Types.ObjectId.isValid(subId)) {
     return { error: PaymeError.ProductNotFound, id };
   }
 
-  const sub = await UserSubscription.findById(params.account.subscription_id);
-  console.log("Found subscription:", sub);
+  const sub = await UserSubscription.findById(subId);
+
   if (!sub) return { error: PaymeError.ProductNotFound, id };
 
   const paymeAmount = Number(params.amount);
 
-  if (sub.amount !== paymeAmount) {
+  // 🔥 FIX: tiyin vs so‘m
+  if (sub.amount * 100 !== paymeAmount) {
     return { error: PaymeError.InvalidAmount, id };
   }
 
-  // Agar obuna boshqa pending tranzaksiya bilan bo'lsa
-  const pendingTransaction = await Transaction.findOne({
+  // pending transaction borligini tekshirish
+  const pending = await Transaction.findOne({
     subscription: sub._id,
     state: STATE.Pending,
   });
-  if (pendingTransaction) {
-    return { error: PaymeError.ProductNotFound, id };
+
+  if (pending) {
+    return { error: PaymeError.Pending, id };
   }
 
-  // Agar obuna allaqachon to'langan bo'lsa
   if (sub.paymeState === STATE.Paid) {
     return { error: PaymeError.AlreadyDone, id };
   }
 
-  // Payme spec: result = { allow: boolean }
   return {
     id,
-    result: {
-      allow: true,
-    },
+    result: { allow: true },
   };
 };
 
+// ================================
+// 💳 CREATE TRANSACTION
+// ================================
 export const createTransaction = async ({ id, params }) => {
-  const { id: paymeId, time } = params;
+  const subId = params.account?.subscription_id;
+  const paymeId = params.id;
 
-  // subscription_id valid ObjectId emasmi?
-  if (!mongoose.Types.ObjectId.isValid(params.account.subscription_id)) {
+  if (!mongoose.Types.ObjectId.isValid(subId)) {
     return { error: PaymeError.ProductNotFound, id };
   }
 
-  const sub = await UserSubscription.findById(params.account.subscription_id);
+  const sub = await UserSubscription.findById(subId).populate("user");
 
   if (!sub) return { error: PaymeError.ProductNotFound, id };
 
-  // Summa tekshiruvi
   const paymeAmount = Number(params.amount);
-  if (sub.amount !== paymeAmount) {
-    console.warn(`Amount mismatch: DB=${sub.amount}, Payme=${paymeAmount}`);
+
+  // 🔥 FIX
+  if (sub.amount * 100 !== paymeAmount) {
     return { error: PaymeError.InvalidAmount, id };
   }
 
-  // Obunani user bilan populate qilish
-  await sub.populate("user");
-
-  // Agar shu paymeId bilan allaqachon tranzaksiya yaratilgan bo'lsa
+  // old transaction
   let transaction = await Transaction.findOne({ paymeId });
+
   if (transaction) {
-    // Agar tranzaksiya timeout bo'lsa, bekor qilish
-    const currentTime = Date.now();
-    const expirationTime = 720000; // 12 daqiqa
-    if (
-      transaction.state === STATE.Pending &&
-      currentTime - transaction.createTime > expirationTime
-    ) {
-      transaction.state = STATE.PendingCanceled;
-      transaction.cancelTime = currentTime;
-      transaction.reason = 4; // Timeout
-      await transaction.save();
-      return { error: PaymeError.CantDoOperation, id };
-    }
     return {
       id,
       result: {
@@ -106,23 +117,24 @@ export const createTransaction = async ({ id, params }) => {
     };
   }
 
-  // Agar obuna boshqa pending tranzaksiya bilan bo'lsa
-  const pendingTransaction = await Transaction.findOne({
+  // boshqa pending bormi?
+  const pending = await Transaction.findOne({
     subscription: sub._id,
     state: STATE.Pending,
   });
-  if (pendingTransaction) {
+
+  if (pending) {
     return { error: PaymeError.Pending, id };
   }
 
-  // Yangi tranzaksiya yaratish
+  // yangi yaratish
   transaction = await Transaction.create({
     paymeId,
     subscription: sub._id,
     user: sub.user._id,
-    amount: params.amount,
+    amount: paymeAmount,
     state: STATE.Pending,
-    createTime: time,
+    createTime: params.time,
   });
 
   return {
@@ -135,12 +147,16 @@ export const createTransaction = async ({ id, params }) => {
   };
 };
 
+// ================================
+// ✅ PERFORM
+// ================================
 export const performTransaction = async ({ id, params }) => {
   const transaction = await Transaction.findOne({ paymeId: params.id });
 
-  if (!transaction) return { error: PaymeError.TransactionNotFound, id };
+  if (!transaction) {
+    return { error: PaymeError.TransactionNotFound, id };
+  }
 
-  // Agar allaqachon to'langan bo'lsa
   if (transaction.state === STATE.Paid) {
     return {
       id,
@@ -152,56 +168,62 @@ export const performTransaction = async ({ id, params }) => {
     };
   }
 
-  // 12 daqiqa timeout tekshiruvi (720000 ms)
-  const currentTime = Date.now();
-  const expirationTime = 720000; // 12 daqiqa
-  if (currentTime - transaction.createTime > expirationTime) {
-    // Timeout - tranzaksiyani bekor qilish
+  const now = Date.now();
+
+  // ⏱ timeout (12 min)
+  if (now - transaction.createTime > 720000) {
     transaction.state = STATE.PendingCanceled;
-    transaction.cancelTime = currentTime;
-    transaction.reason = 4; // Timeout
+    transaction.cancelTime = now;
+    transaction.reason = 4;
     await transaction.save();
+
     return { error: PaymeError.CantDoOperation, id };
   }
 
-  const performTime = currentTime;
+  // success
   transaction.state = STATE.Paid;
-  transaction.performTime = performTime;
+  transaction.performTime = now;
   await transaction.save();
 
-  // Obunani ham faollashtirish
+  // 🔥 subscription activate
   const subscription = await UserSubscription.findById(
     transaction.subscription,
-  );
+  ).populate("plan");
+
   if (subscription) {
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setDate(
-      endDate.getDate() + (subscription.plan?.durationDays || 30),
-    );
+    const start = new Date();
+    const end = new Date();
+
+    end.setDate(end.getDate() + (subscription.plan?.durationDays || 30));
 
     subscription.isActive = true;
-    subscription.startDate = startDate;
-    subscription.endDate = endDate;
+    subscription.startDate = start;
+    subscription.endDate = end;
+    subscription.paymeState = STATE.Paid;
+
     await subscription.save();
   }
 
   return {
     id,
     result: {
-      perform_time: performTime,
+      perform_time: now,
       transaction: transaction.paymeId,
       state: transaction.state,
     },
   };
 };
 
+// ================================
+// ❌ CANCEL
+// ================================
 export const cancelTransaction = async ({ id, params }) => {
   const transaction = await Transaction.findOne({ paymeId: params.id });
 
-  if (!transaction) return { error: PaymeError.TransactionNotFound, id };
+  if (!transaction) {
+    return { error: PaymeError.TransactionNotFound, id };
+  }
 
-  // Agar allaqachon bekor qilingan bo'lsa, o'zgartirmasdan qaytarish
   if (transaction.state < 0) {
     return {
       id,
@@ -213,29 +235,35 @@ export const cancelTransaction = async ({ id, params }) => {
     };
   }
 
-  const cancelTime = Date.now();
+  const now = Date.now();
+
   transaction.state = -Math.abs(transaction.state);
-  transaction.cancelTime = cancelTime;
+  transaction.cancelTime = now;
   transaction.reason = params.reason;
+
   await transaction.save();
 
   return {
     id,
     result: {
-      cancel_time: cancelTime,
+      cancel_time: now,
       transaction: transaction.paymeId,
       state: transaction.state,
     },
   };
 };
 
+// ================================
+// 🔍 CHECK
+// ================================
 export const checkTransaction = async ({ id, params }) => {
-  // Transaction modelidan qidirish
   const transaction = await Transaction.findOne({
     paymeId: params.id,
   });
 
-  if (!transaction) return { error: PaymeError.TransactionNotFound, id };
+  if (!transaction) {
+    return { error: PaymeError.TransactionNotFound, id };
+  }
 
   return {
     id,
@@ -250,34 +278,34 @@ export const checkTransaction = async ({ id, params }) => {
   };
 };
 
+// ================================
+// 📊 STATEMENT
+// ================================
 export const getStatement = async ({ id, params }) => {
-  const { from, to } = params;
-
-  // Vaqt oraliigidagi tranzaksiyalarni olish
   const transactions = await Transaction.find({
-    createTime: { $gte: from, $lte: to },
-  });
-
-  // Payme spec formatida qaytarish
-  const result = transactions.map((t) => ({
-    id: t.paymeId,
-    time: t.createTime,
-    amount: t.amount,
-    account: {
-      subscription_id: t.subscription.toString(),
+    createTime: {
+      $gte: params.from,
+      $lte: params.to,
     },
-    create_time: t.createTime,
-    perform_time: t.performTime || 0,
-    cancel_time: t.cancelTime || 0,
-    transaction: t.paymeId,
-    state: t.state,
-    reason: t.reason,
-  }));
+  });
 
   return {
     id,
     result: {
-      transactions: result,
+      transactions: transactions.map((t) => ({
+        id: t.paymeId,
+        time: t.createTime,
+        amount: t.amount,
+        account: {
+          subscription_id: t.subscription.toString(),
+        },
+        create_time: t.createTime,
+        perform_time: t.performTime || 0,
+        cancel_time: t.cancelTime || 0,
+        transaction: t.paymeId,
+        state: t.state,
+        reason: t.reason,
+      })),
     },
   };
 };
