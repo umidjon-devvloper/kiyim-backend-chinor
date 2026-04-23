@@ -5,11 +5,12 @@ import { PaymeError } from '../enum/transaction.enum.js'
 
 const PAYME_MERCHANT_KEY = process.env.PAYME_MERCHANT_KEY
 
+
 export const paymeCheckToken = (req, res, next) => {
 	try {
 		const { id } = req.body
 		const authHeader = req.headers.authorization
-		
+
 		const token = authHeader && authHeader.split(' ')[1]
 		console.log('Token:', token)
 		if (!token) throw new TransactionError(PaymeError.InvalidAuthorization, id)
