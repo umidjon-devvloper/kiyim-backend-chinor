@@ -1,0 +1,346 @@
+Вызов метода 'CheckPerformTransaction' c неверными параметрами авторизации
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181217,
+    "method": "CheckPerformTransaction",
+    "params": {
+        "amount": 50000,
+        "account": {}
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:20:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'CreateTransaction' c неверными параметрами авторизации
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181218,
+    "method": "CreateTransaction",
+    "params": {
+        "id": "5305e3bab097f420a62ced0b",
+        "time": 1399114284039,
+        "amount": 50000,
+        "account": {}
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:20:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'PerformTransaction' c неверными параметрами авторизации
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181219,
+    "method": "PerformTransaction",
+    "params": {
+        "id": "5305e3bab097f420a62ced0b"
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:20:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'CancelTransaction' c неверными параметрами авторизации
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181220,
+    "method": "CancelTransaction",
+    "params": {
+        "id": "5305e3bab097f420a62ced0b"
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:20:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'CheckTransaction' c неверными параметрами авторизации
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181221,
+    "method": "CheckTransaction",
+    "params": {
+        "id": "5305e3bab097f420a62ced0b"
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:20:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'GetStatement' c неверными параметрами авторизации
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181222,
+    "method": "GetStatement",
+    "params": {
+        "from": 1399114284039,
+        "to": 1399114285039
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:20:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'ChangePassword' c неверными параметрами авторизации
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181223,
+    "method": "ChangePassword",
+    "params": {
+        "password": "oKdQS4?ArxfahtD2c6uoyjj#Ep4aVx9YJxwP"
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:20:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'CheckPerformTransaction' без заголовка Authorization
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181224,
+    "method": "CheckPerformTransaction",
+    "params": {
+        "amount": 50000,
+        "account": {}
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:14:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'CreateTransaction' без заголовка Authorization
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181225,
+    "method": "CreateTransaction",
+    "params": {
+        "id": "5305e3bab097f420a62ced0b",
+        "time": 1399114284039,
+        "amount": 50000,
+        "account": {}
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:14:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'PerformTransaction' без заголовка Authorization
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181226,
+    "method": "PerformTransaction",
+    "params": {
+        "id": "5305e3bab097f420a62ced0b"
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:14:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'CancelTransaction' без заголовка Authorization
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181227,
+    "method": "CancelTransaction",
+    "params": {
+        "id": "5305e3bab097f420a62ced0b"
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:14:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'CheckTransaction' без заголовка Authorization
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181228,
+    "method": "CheckTransaction",
+    "params": {
+        "id": "5305e3bab097f420a62ced0b"
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:14:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'GetStatement' без заголовка Authorization
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181229,
+    "method": "GetStatement",
+    "params": {
+        "from": 1399114284039,
+        "to": 1399114285039
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:14:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                
+error Вызов метода 'ChangePassword' без заголовка Authorization
+Внутренная ошибка сервера! Ваш сервер вернул HTTP статус 500, это значит что на вашем сервере произошла внутренная ошибка при данном запросе.
+
+Для более подробной информации об ожидаемом поведении метода посмотрите спецификацию метода open_in_new
+
+Содержание (Body)
+Заголовки (Headers)
+Запрос от песочницы (Request)
+                  
+{
+    "jsonrpc": "2.0",
+    "id": 181230,
+    "method": "ChangePassword",
+    "params": {
+        "password": "oKdQS4?ArxfahtD2c6uoyjj#Ep4aVx9YJxwP"
+    }
+}
+
+                
+Ответ Вашего API (Response)
+                  
+"{\"success\":false,\"message\":\"Server xatosi\",\"stack\":\"Error\\n    at paymeCheckToken (file:///C:/Users/umidjon/Desktop/kiyim-backend-payme-v2/src/middleware/paymeAuth.js:14:10)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:149:13)\\n    at Route.dispatch (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\route.js:119:3)\\n    at Layer.handle [as handle_request] (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\layer.js:95:5)\\n    at C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:284:15\\n    at Function.process_params (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:346:12)\\n    at next (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:280:10)\\n    at Function.handle (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:175:3)\\n    at router (C:\\\\Users\\\\umidjon\\\\Desktop\\\\kiyim-backend-payme-v2\\\\node_modules\\\\express\\\\lib\\\\router\\\\index.js:47:12)\"}"
+
+                

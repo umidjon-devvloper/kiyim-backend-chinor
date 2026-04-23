@@ -1,5 +1,5 @@
 import * as service from "../services/paymeService.js";
-import { PaymeError } from "../utils/errors.js";
+import { PaymeError } from "../enum/transaction.enum.js";
 
 export const handlePayme = async (req, res) => {
   const { method, params, id } = req.body;
@@ -27,8 +27,12 @@ export const handlePayme = async (req, res) => {
       result = await service.checkTransaction({ id, params });
       break;
 
+    case "GetStatement":
+      result = await service.getStatement({ id, params });
+      break;
+
     default:
-      result = PaymeError.methodNotFound(id);
+      result = { error: PaymeError.CantDoOperation, id };
   }
 
   res.json({

@@ -1,4 +1,17 @@
 export const errorHandler = (err, req, res, next) => {
+  // Payme TransactionError uchun JSON-RPC format
+  if (err.isTransactionError) {
+    return res.status(200).json({
+      jsonrpc: "2.0",
+      error: {
+        code: err.transactionErrorCode,
+        message: err.transactionErrorMessage,
+        data: err.transactionData,
+      },
+      id: err.transactionId,
+    });
+  }
+
   let statusCode = err.statusCode || 500;
   let message = err.message || "Server xatosi";
 

@@ -17,12 +17,11 @@ import { errorHandler } from "./middleware/errorHandler.js";
 const app = express();
 
 app.use(helmet());
+// Parse CORS origins from env var
+
 app.use(
   cors({
-    origin: [
-      "https://checkout.test.paycom.uz",
-      "https://checkout.paycom.uz",
-    ],
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",

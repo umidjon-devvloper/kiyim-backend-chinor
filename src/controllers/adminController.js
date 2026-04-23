@@ -23,7 +23,13 @@ export const getStats = async (req, res, next) => {
       UserSubscription.countDocuments({ paymeState: 2, endDate: { $gt: now } }),
       UserSubscription.aggregate([
         { $match: { paymeState: 2 } },
-        { $group: { _id: null, totalSubscriptions: { $sum: 1 }, totalRevenue: { $sum: "$amount" } } },
+        {
+          $group: {
+            _id: null,
+            totalSubscriptions: { $sum: 1 },
+            totalRevenue: { $sum: "$amount" },
+          },
+        },
       ]),
       UserSubscription.find({ paymeState: 2 })
         .sort({ createdAt: -1 })
@@ -129,7 +135,7 @@ export const updateUserRole = async (req, res, next) => {
     const user = await User.findByIdAndUpdate(
       id,
       { role },
-      { new: true }
+      { new: true },
     ).select("-__v");
 
     if (!user) return errorResponse(res, "Foydalanuvchi topilmadi", 404);

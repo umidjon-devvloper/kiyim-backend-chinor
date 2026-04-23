@@ -86,33 +86,33 @@ export const googleLogin = async (req, res, next) => {
 export const emailLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    
+
     // Validatsiya
     if (!email || !password) {
       return errorResponse(res, "Email va parol talab etiladi", 400);
     }
-    
+
     // Foydalanuvchini topish
     const user = await User.findOne({ email });
     if (!user) {
       return errorResponse(res, "Foydalanuvchi topilmadi", 404);
     }
-    
+
     // Parol tekshirish (agar user password bilan yaratilgan bo'lsa)
     if (user.password && user.password !== password) {
       return errorResponse(res, "Email yoki parol noto'g'ri", 401);
     }
-    
+
     const token = generateToken(user._id);
-    return successResponse(res, { 
-      token, 
+    return successResponse(res, {
+      token,
       user: {
         _id: user._id,
         email: user.email,
         name: user.name,
         avatar: user.avatar,
         role: user.role,
-      }
+      },
     });
   } catch (error) {
     next(error);
@@ -122,27 +122,31 @@ export const emailLogin = async (req, res, next) => {
 export const emailRegister = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
-    
+
     // Validatsiya
     if (!name || !email || !password) {
       return errorResponse(res, "Barcha maydonlarni to'ldiring", 400);
     }
-    
+
     if (password.length < 6) {
-      return errorResponse(res, "Parol kamida 6 ta belgidan iborat bo'lishi kerak", 400);
+      return errorResponse(
+        res,
+        "Parol kamida 6 ta belgidan iborat bo'lishi kerak",
+        400,
+      );
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return errorResponse(res, "To'g'ri email kiriting", 400);
     }
-    
+
     // Email mavjudligini tekshirish
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return errorResponse(res, "Bu email allaqachon ro'yxatdan o'tgan", 409);
     }
-    
+
     // Yangi foydalanuvchi yaratish
     const user = await User.create({
       email,
@@ -150,9 +154,9 @@ export const emailRegister = async (req, res, next) => {
       password, // Production da hash qilish kerak
       role: "user",
     });
-    
+
     const token = generateToken(user._id);
-    
+
     return successResponse(
       res,
       {
@@ -166,7 +170,7 @@ export const emailRegister = async (req, res, next) => {
         },
       },
       "Ro'yxatdan o'tish muvaffaqiyatli",
-      201
+      201,
     );
   } catch (error) {
     next(error);

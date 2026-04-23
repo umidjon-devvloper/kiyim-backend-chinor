@@ -1,27 +1,27 @@
-import base64 from 'base-64';
-import TransactionError from '../errors/transaction.error.js';
-import { PaymeError } from '../enum/transaction.enum.js';
+import base64 from 'base-64'
+import TransactionError from '../errors/transaction.error.js'
+import { PaymeError } from '../enum/transaction.enum.js'
 
-const PAYME_MERCHANT_KEY = process.env.PAYME_MERCHANT_KEY;
+
+const PAYME_MERCHANT_KEY = process.env.PAYME_MERCHANT_KEY
 
 export const paymeCheckToken = (req, res, next) => {
 	try {
-		const { id } = req.body;
-		const authHeader = req.headers.authorization;
-		const token = authHeader && authHeader.split(' ')[1];
+		const { id } = req.body
+		const authHeader = req.headers.authorization
 		
-		if (!token) {
-			throw new TransactionError(PaymeError.InvalidAuthorization, id);
-		}
+		const token = authHeader && authHeader.split(' ')[1]
+		console.log('Token:', token)
+		if (!token) throw new TransactionError(PaymeError.InvalidAuthorization, id)
 
-		const data = base64.decode(token);
+		const data = base64.decode(token)
 
 		if (!data.includes(PAYME_MERCHANT_KEY)) {
-			throw new TransactionError(PaymeError.InvalidAuthorization, id);
+			throw new TransactionError(PaymeError.InvalidAuthorization, id)
 		}
 
-		next();
+		next()
 	} catch (err) {
-		next(err);
+		next(err)
 	}
-};
+}

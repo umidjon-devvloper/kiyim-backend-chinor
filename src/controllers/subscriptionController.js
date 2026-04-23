@@ -2,22 +2,26 @@ import { SubscriptionPlan, UserSubscription } from "../models/Subscription.js";
 import { successResponse, errorResponse } from "../utils/response.js";
 import { buildPaymeUrl } from "../services/paymeService.js";
 
-
-
 // ─── PLANS ────────────────────────────────────────────────────
 
 export const getPlans = async (req, res, next) => {
   try {
-    const plans = await SubscriptionPlan.find({ isActive: true }).sort({ price: 1 });
+    const plans = await SubscriptionPlan.find({ isActive: true }).sort({
+      price: 1,
+    });
     return successResponse(res, plans);
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getAllPlans = async (req, res, next) => {
   try {
     const plans = await SubscriptionPlan.find().sort({ price: 1 });
     return successResponse(res, plans);
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const createPlan = async (req, res, next) => {
@@ -26,24 +30,39 @@ export const createPlan = async (req, res, next) => {
     if (!name || !duration || !price) {
       return errorResponse(res, "name, duration va price talab etiladi", 400);
     }
-    const plan = await SubscriptionPlan.create({ name, duration, price, description });
+    const plan = await SubscriptionPlan.create({
+      name,
+      duration,
+      price,
+      description,
+    });
     return successResponse(res, plan, "Reja yaratildi", 201);
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const updatePlan = async (req, res, next) => {
   try {
-    const plan = await SubscriptionPlan.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const plan = await SubscriptionPlan.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true },
+    );
     if (!plan) return errorResponse(res, "Reja topilmadi", 404);
     return successResponse(res, plan, "Reja yangilandi");
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const deletePlan = async (req, res, next) => {
   try {
     await SubscriptionPlan.findByIdAndDelete(req.params.id);
     return successResponse(res, null, "Reja o'chirildi");
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 // ─── USER SUBSCRIPTION ────────────────────────────────────────
@@ -51,7 +70,7 @@ export const deletePlan = async (req, res, next) => {
 export const getMySubscription = async (req, res, next) => {
   try {
     const now = new Date();
-    
+
     // Avval aktiv obunani qidiramiz (to'langan)
     const activeSub = await UserSubscription.findOne({
       user: req.user._id,
@@ -66,7 +85,9 @@ export const getMySubscription = async (req, res, next) => {
       return successResponse(res, {
         hasSubscription: true,
         subscription: activeSub,
-        daysLeft: Math.ceil((new Date(activeSub.endDate) - now) / (1000 * 60 * 60 * 24)),
+        daysLeft: Math.ceil(
+          (new Date(activeSub.endDate) - now) / (1000 * 60 * 60 * 24),
+        ),
         pendingSubscription: null,
       });
     }
@@ -84,14 +105,18 @@ export const getMySubscription = async (req, res, next) => {
       hasSubscription: false,
       subscription: null,
       daysLeft: 0,
-      pendingSubscription: pendingSub ? {
-        _id: pendingSub._id.toString(),
-        plan: pendingSub.plan,
-        amount: pendingSub.amount,
-        createdAt: pendingSub.createdAt,
-      } : null,
+      pendingSubscription: pendingSub
+        ? {
+            _id: pendingSub._id.toString(),
+            plan: pendingSub.plan,
+            amount: pendingSub.amount,
+            createdAt: pendingSub.createdAt,
+          }
+        : null,
     });
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const createSubscriptionOrder = async (req, res, next) => {
@@ -115,31 +140,37 @@ export const createSubscriptionOrder = async (req, res, next) => {
     endDate.setDate(endDate.getDate() + plan.duration);
 
     const subscription = await UserSubscription.create({
-      user:      req.user._id,
-      plan:      plan._id,
-      amount:    plan.price,   // tiyinda saqlash
+      user: req.user._id,
+      plan: plan._id,
+      amount: plan.price, // tiyinda saqlash
       startDate,
       endDate,
       paymeState: 1,
-      isActive:   false,
+      isActive: false,
     });
 
     // Payme checkout URL (test yoki prod)
     const paymeUrl = buildPaymeUrl(subscription._id, plan.price);
+    console.log("=== PAYME DEBUG ===");
+    console.log("Amount (tiyin):", plan.price);
+    console.log("Payme URL:", paymeUrl);
+    console.log("==================");
 
     return successResponse(
       res,
       {
         subscriptionId: subscription._id,
-        planName:       plan.name,
-        amount:         plan.price,   // tiyinda
-        duration:       plan.duration,
-        paymeUrl,                     // ← WebView ga beriladigan URL
+        planName: plan.name,
+        amount: plan.price, // tiyinda
+        duration: plan.duration,
+        paymeUrl, // ← WebView ga beriladigan URL
       },
       "Obuna buyurtmasi yaratildi",
-      201
+      201,
     );
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getSubscriptionHistory = async (req, res, next) => {
@@ -165,7 +196,9 @@ export const getSubscriptionHistory = async (req, res, next) => {
         pages: Math.ceil(total / parseInt(limit)),
       },
     });
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Admin: barcha obunalar
@@ -195,7 +228,9 @@ export const getAllSubscriptions = async (req, res, next) => {
         pages: Math.ceil(total / parseInt(limit)),
       },
     });
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Utility: foydalanuvchining aktiv obunasi bormi
@@ -213,7 +248,7 @@ export const checkSubscription = async (userId) => {
 export const continuePendingPayment = async (req, res, next) => {
   try {
     const { subscriptionId } = req.body;
-    
+
     if (!subscriptionId) {
       return errorResponse(res, "subscriptionId talab etiladi", 400);
     }
@@ -242,7 +277,9 @@ export const continuePendingPayment = async (req, res, next) => {
         duration: subscription.plan.duration,
         paymeUrl,
       },
-      "To'lov davom ettirildi"
+      "To'lov davom ettirildi",
     );
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
