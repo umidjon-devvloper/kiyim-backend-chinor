@@ -6,9 +6,23 @@ import { TransactionState, PaymeError } from "../enum/transaction.enum.js";
 const STATE = TransactionState;
 
 // ================================
+// 💰 HELPERS (MUHIM)
+// ================================
+
+// so'm -> tiyin
+export const toTiyin = (amount) => {
+  return Math.round(Number(amount || 0) * 100);
+};
+
+// tiyin -> so'm (optional)
+export const toSom = (amount) => {
+  return Math.floor(Number(amount || 0) / 100);
+};
+
+// ================================
 // 🔗 PAYME URL
 // ================================
-export function buildPaymeUrl(subscriptionId, amountInTiyin) {
+export function buildPaymeUrl(subscriptionId, amountInSom) {
   const merchantId = process.env.PAYME_MERCHANT_ID;
 
   if (!merchantId || merchantId.length !== 24) {
@@ -20,13 +34,13 @@ export function buildPaymeUrl(subscriptionId, amountInTiyin) {
       ? subscriptionId
       : subscriptionId.toString();
 
-  const amount = Math.round(Number(amountInTiyin));
+  // 🔥 SO'M -> TIYIN
+  const amount = toTiyin(amountInSom);
 
   if (!Number.isInteger(amount) || amount <= 0) {
     throw new Error("Amount noto‘g‘ri");
   }
 
-  // 🔥 PAYME DOCS FORMAT
   const params = `m=${merchantId};ac.subscription_id=${subId};a=${amount}`;
 
   console.log("RAW PARAMS:", params);
@@ -56,12 +70,11 @@ export const checkPerformTransaction = async ({ id, params }) => {
 
   const paymeAmount = Number(params.amount);
 
-  // 🔥 FIX: tiyin vs so‘m
-  if (sub.amount * 100 !== paymeAmount) {
+  // 🔥 SO'M -> TIYIN CHECK
+  if (toTiyin(sub.amount) !== paymeAmount) {
     return { error: PaymeError.InvalidAmount, id };
   }
 
-  // pending transaction borligini tekshirish
   const pending = await Transaction.findOne({
     subscription: sub._id,
     state: STATE.Pending,
@@ -98,12 +111,11 @@ export const createTransaction = async ({ id, params }) => {
 
   const paymeAmount = Number(params.amount);
 
-  // 🔥 FIX
-  if (sub.amount * 100 !== paymeAmount) {
+  // 🔥 TIYIN CHECK
+  if (toTiyin(sub.amount) !== paymeAmount) {
     return { error: PaymeError.InvalidAmount, id };
   }
 
-  // old transaction
   let transaction = await Transaction.findOne({ paymeId });
 
   if (transaction) {
@@ -117,7 +129,6 @@ export const createTransaction = async ({ id, params }) => {
     };
   }
 
-  // boshqa pending bormi?
   const pending = await Transaction.findOne({
     subscription: sub._id,
     state: STATE.Pending,
@@ -127,12 +138,11 @@ export const createTransaction = async ({ id, params }) => {
     return { error: PaymeError.Pending, id };
   }
 
-  // yangi yaratish
   transaction = await Transaction.create({
     paymeId,
     subscription: sub._id,
     user: sub.user._id,
-    amount: paymeAmount,
+    amount: paymeAmount, // 🔥 TIYIN saqlanadi
     state: STATE.Pending,
     createTime: params.time,
   });
@@ -148,7 +158,7 @@ export const createTransaction = async ({ id, params }) => {
 };
 
 // ================================
-// ✅ PERFORM
+// ✅ PERFORM TRANSACTION
 // ================================
 export const performTransaction = async ({ id, params }) => {
   const transaction = await Transaction.findOne({ paymeId: params.id });
@@ -170,7 +180,6 @@ export const performTransaction = async ({ id, params }) => {
 
   const now = Date.now();
 
-  // ⏱ timeout (12 min)
   if (now - transaction.createTime > 720000) {
     transaction.state = STATE.PendingCanceled;
     transaction.cancelTime = now;
@@ -180,12 +189,10 @@ export const performTransaction = async ({ id, params }) => {
     return { error: PaymeError.CantDoOperation, id };
   }
 
-  // success
   transaction.state = STATE.Paid;
   transaction.performTime = now;
   await transaction.save();
 
-  // 🔥 subscription activate
   const subscription = await UserSubscription.findById(
     transaction.subscription,
   ).populate("plan");
@@ -215,7 +222,7 @@ export const performTransaction = async ({ id, params }) => {
 };
 
 // ================================
-// ❌ CANCEL
+// ❌ CANCEL TRANSACTION
 // ================================
 export const cancelTransaction = async ({ id, params }) => {
   const transaction = await Transaction.findOne({ paymeId: params.id });
@@ -254,7 +261,7 @@ export const cancelTransaction = async ({ id, params }) => {
 };
 
 // ================================
-// 🔍 CHECK
+// 🔍 CHECK TRANSACTION
 // ================================
 export const checkTransaction = async ({ id, params }) => {
   const transaction = await Transaction.findOne({
@@ -295,7 +302,7 @@ export const getStatement = async ({ id, params }) => {
       transactions: transactions.map((t) => ({
         id: t.paymeId,
         time: t.createTime,
-        amount: t.amount,
+        amount: t.amount, // 🔥 TIYIN
         account: {
           subscription_id: t.subscription.toString(),
         },
