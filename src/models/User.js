@@ -33,6 +33,36 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin"],
       default: "user",
     },
+    
+    // Premium account fields
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    premiumActivatedAt: {
+      type: Date,
+      default: null,
+    },
+    premiumActivatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    activationType: {
+      type: String,
+      enum: ["purchase", "subscription", "manual", null],
+      default: null,
+    },
+    lastPurchaseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Purchase",
+      default: null,
+    },
+    lastSubscriptionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserSubscription",
+      default: null,
+    },
   },
   { timestamps: true }
 );

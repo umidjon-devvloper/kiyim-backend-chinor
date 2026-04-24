@@ -57,15 +57,16 @@ export const getStats = async (req, res, next) => {
 
 export const getUsers = async (req, res, next) => {
   try {
-    const { role, page = 1, limit = 20 } = req.query;
+    const { role, page = 1, limit = 20, premium } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const filter = {};
     if (role && ["user", "admin"].includes(role)) filter.role = role;
+    if (premium !== undefined) filter.isPremium = premium === "true";
 
     const [users, total] = await Promise.all([
       User.find(filter)
-        .select("-__v")
+        .select("-__v -password")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit)),
