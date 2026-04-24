@@ -1,17 +1,35 @@
 import Pattern from "../models/Pattern.js";
 import Favorite from "../models/Favorite.js";
 import { UserSubscription } from "../models/Subscription.js";
+import Notification from "../models/Notification.js";
 import { deleteFile, deleteFiles } from "../services/uploadthingService.js";
+import { sendToAll } from "../services/notificationService.js";
 import { successResponse, errorResponse } from "../utils/response.js";
 
 const hasActiveSubscription = async (userId) => {
   const now = new Date();
+  
+  // Check UserSubscription model
   const sub = await UserSubscription.findOne({
     user: userId,
     paymeState: 2,
     endDate: { $gt: now },
   });
-  return !!sub;
+  
+  if (sub) return true;
+  
+  // Check manual premium activation on User model
+  const User = (await import("../models/User.js")).default;
+  const user = await User.findById(userId);
+  
+  if (user && user.isPremium && user.premiumExpiresAt) {
+    const expiryDate = new Date(user.premiumExpiresAt);
+    if (expiryDate > now) {
+      return true;
+    }
+  }
+  
+  return false;
 };
 
 export const getPatterns = async (req, res, next) => {
@@ -128,6 +146,38 @@ export const createPattern = async (req, res, next) => {
     });
 
     const populated = await pattern.populate("category", "name slug icon");
+    
+    // Send push notification to all users
+    try {
+      const notifType = type === "FREE" ? "free_pattern" : "paid_pattern";
+      const notifTitle = type === "FREE" 
+        ? "🎉 Bepul yangi pattern!" 
+        : "✨ Yangi pattern qo'shildi!";
+      const notifBody = `"${title}" - ${type === "FREE" ? "bepul" : "premium"} pattern hozir mavjud!`;
+      
+      // Create notification record
+      await Notification.create({
+        title: notifTitle,
+        body: notifBody,
+        type: notifType,
+        patternId: pattern._id,
+        sentBy: req.user._id,
+      });
+
+      // Send push notification (async, don't wait)
+      sendToAll(notifTitle, notifBody, {
+        type: notifType,
+        patternId: pattern._id.toString(),
+      }).then(result => {
+        console.log(`✅ Pattern notification sent: ${result.success} success, ${result.failure} failure`);
+      }).catch(err => {
+        console.error("❌ Error sending pattern notification:", err.message);
+      });
+    } catch (notifError) {
+      console.error("❌ Error creating notification:", notifError.message);
+      // Don't fail the pattern creation if notification fails
+    }
+    
     return successResponse(res, populated, "Pattern yaratildi", 201);
   } catch (error) { next(error); }
 };

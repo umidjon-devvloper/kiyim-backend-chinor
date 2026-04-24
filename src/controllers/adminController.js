@@ -150,7 +150,7 @@ export const updateUserRole = async (req, res, next) => {
 export const activateUserAccount = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { purchaseId, subscriptionId, activationType } = req.body;
+    const { purchaseId, subscriptionId, activationType, duration } = req.body;
 
     if (!activationType || !["purchase", "subscription", "manual"].includes(activationType)) {
       return errorResponse(res, "activationType purchase, subscription yoki manual bo'lishi kerak", 400);
@@ -164,6 +164,18 @@ export const activateUserAccount = async (req, res, next) => {
     user.premiumActivatedAt = new Date();
     user.premiumActivatedBy = req.user._id;
     user.activationType = activationType;
+    
+    // Set duration and expiry date
+    if (duration) {
+      user.premiumDuration = parseInt(duration);
+      user.premiumExpiresAt = new Date();
+      user.premiumExpiresAt.setDate(user.premiumExpiresAt.getDate() + parseInt(duration));
+    } else if (activationType === "manual") {
+      // Default 30 days for manual activation if not specified
+      user.premiumDuration = 30;
+      user.premiumExpiresAt = new Date();
+      user.premiumExpiresAt.setDate(user.premiumExpiresAt.getDate() + 30);
+    }
     
     if (purchaseId) {
       user.lastPurchaseId = purchaseId;
@@ -185,8 +197,7 @@ export const activateUserAccount = async (req, res, next) => {
 
     // If it's a subscription activation, update the subscription state
     if (subscriptionId && activationType === "subscription") {
-      const Subscription = (await import("../models/Subscription.js")).default;
-      await Subscription.findByIdAndUpdate(subscriptionId, {
+      await UserSubscription.findByIdAndUpdate(subscriptionId, {
         paymeState: 2,
         isActive: true
       });
@@ -207,6 +218,8 @@ export const deactivateUserAccount = async (req, res, next) => {
 
     user.isPremium = false;
     user.premiumActivatedAt = null;
+    user.premiumExpiresAt = null;
+    user.premiumDuration = null;
     user.premiumActivatedBy = null;
     user.activationType = null;
 

@@ -12,6 +12,7 @@ import userRoutes from "./routes/user.js";
 import adminRoutes from "./routes/admin.js";
 import uploadthingRoutes from "./routes/uploadthing.js";
 import subscriptionRoutes from "./routes/subscription.js";
+import notificationRoutes from "./routes/notifications.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
@@ -60,6 +61,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 app.use("/api/upload", uploadthingRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Route topilmadi" });
 });

@@ -32,16 +32,42 @@ export const updateProfile = async (req, res, next) => {
 export const getMySubscription = async (req, res, next) => {
   try {
     const now = new Date();
-    const active = await UserSubscription.findOne({
+    
+    // Check UserSubscription
+    const activeSub = await UserSubscription.findOne({
       user: req.user._id,
       paymeState: 2,
       endDate: { $gt: now },
     }).populate("plan").sort({ endDate: -1 });
 
+    // Check manual premium activation
+    const isPremium = req.user.isPremium && req.user.premiumExpiresAt && new Date(req.user.premiumExpiresAt) > now;
+    
+    const hasActive = !!activeSub || isPremium;
+    
+    let subscriptionData = null;
+    let daysLeft = 0;
+    
+    if (activeSub) {
+      subscriptionData = activeSub;
+      daysLeft = Math.ceil((new Date(activeSub.endDate) - now) / (1000 * 60 * 60 * 24));
+    } else if (isPremium && req.user.premiumExpiresAt) {
+      // Manual premium
+      subscriptionData = {
+        plan: { name: "Qo'lda aktivlashtirilgan", duration: req.user.premiumDuration },
+        startDate: req.user.premiumActivatedAt,
+        endDate: req.user.premiumExpiresAt,
+        activationType: "manual",
+      };
+      daysLeft = Math.ceil((new Date(req.user.premiumExpiresAt) - now) / (1000 * 60 * 60 * 24));
+    }
+
     return successResponse(res, {
-      hasSubscription: !!active,
-      subscription: active || null,
-      daysLeft: active ? Math.ceil((new Date(active.endDate) - now) / (1000 * 60 * 60 * 24)) : 0,
+      hasSubscription: hasActive,
+      isPremium: hasActive,
+      subscription: subscriptionData,
+      daysLeft,
+      premiumExpiresAt: isPremium ? req.user.premiumExpiresAt : null,
     });
   } catch (error) { next(error); }
 };

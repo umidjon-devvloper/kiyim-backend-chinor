@@ -43,6 +43,14 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    premiumExpiresAt: {
+      type: Date,
+      default: null,
+    },
+    premiumDuration: {
+      type: Number, // days: 30, 90, 365
+      default: null,
+    },
     premiumActivatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -62,6 +70,16 @@ const userSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserSubscription",
       default: null,
+    },
+    
+    // FCM Token for push notifications
+    fcmToken: {
+      type: String,
+      default: null,
+    },
+    notificationsEnabled: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }
