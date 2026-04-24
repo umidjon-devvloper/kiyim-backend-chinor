@@ -145,3 +145,145 @@ export const updateUserRole = async (req, res, next) => {
     next(error);
   }
 };
+
+export const activateUserAccount = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { purchaseId, subscriptionId, activationType } = req.body;
+
+    if (!activationType || !["purchase", "subscription", "manual"].includes(activationType)) {
+      return errorResponse(res, "activationType purchase, subscription yoki manual bo'lishi kerak", 400);
+    }
+
+    const user = await User.findById(id);
+    if (!user) return errorResponse(res, "Foydalanuvchi topilmadi", 404);
+
+    // Activate user account - set premium status
+    user.isPremium = true;
+    user.premiumActivatedAt = new Date();
+    user.premiumActivatedBy = req.user._id;
+    user.activationType = activationType;
+    
+    if (purchaseId) {
+      user.lastPurchaseId = purchaseId;
+    }
+    
+    if (subscriptionId) {
+      user.lastSubscriptionId = subscriptionId;
+    }
+
+    await user.save();
+
+    // If it's a purchase activation, update the purchase state
+    if (purchaseId && activationType === "purchase") {
+      await Purchase.findByIdAndUpdate(purchaseId, {
+        paymeState: 2,
+        performTime: new Date()
+      });
+    }
+
+    // If it's a subscription activation, update the subscription state
+    if (subscriptionId && activationType === "subscription") {
+      const Subscription = (await import("../models/Subscription.js")).default;
+      await Subscription.findByIdAndUpdate(subscriptionId, {
+        paymeState: 2,
+        isActive: true
+      });
+    }
+
+    return successResponse(res, user, "Foydalanuvchi accounti aktivlashtirildi");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deactivateUserAccount = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+    if (!user) return errorResponse(res, "Foydalanuvchi topilmadi", 404);
+
+    user.isPremium = false;
+    user.premiumActivatedAt = null;
+    user.premiumActivatedBy = null;
+    user.activationType = null;
+
+    await user.save();
+
+    return successResponse(res, user, "Foydalanuvchi accounti deaktivlashtirildi");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPendingActivations = async (req, res, next) => {
+  try {
+    const { page = 1, limit = 20, type } = req.query;
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const filter = { paymeState: 1 };
+    
+    if (type === "subscription") {
+      const Subscription = (await import("../models/Subscription.js")).default;
+      const pendingSubscriptions = await Subscription.find({ paymeState: 1 })
+        .populate("user", "name email avatar")
+        .populate("plan", "name price duration")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+
+      const totalSubscriptions = await Subscription.countDocuments({ paymeState: 1 });
+
+      return successResponse(res, {
+        activations: pendingSubscriptions.map(sub => ({
+          _id: sub._id,
+          type: "subscription",
+          user: sub.user,
+          plan: sub.plan,
+          amount: sub.amount,
+          paymeTransactionId: sub.paymeTransactionId,
+          createdAt: sub.createdAt
+        })),
+        pagination: {
+          total: totalSubscriptions,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          pages: Math.ceil(totalSubscriptions / parseInt(limit)),
+        },
+      });
+    }
+
+    const [purchases, totalPurchases] = await Promise.all([
+      Purchase.find(filter)
+        .populate("user", "name email avatar")
+        .populate("pattern", "title previewImage type price")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit)),
+      Purchase.countDocuments(filter),
+    ]);
+
+    const activations = purchases.map(purchase => ({
+      _id: purchase._id,
+      type: "purchase",
+      user: purchase.user,
+      pattern: purchase.pattern,
+      amount: purchase.amount,
+      paymeTransactionId: purchase.paymeTransactionId,
+      createdAt: purchase.createdAt
+    }));
+
+    return successResponse(res, {
+      activations,
+      pagination: {
+        total: totalPurchases,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(totalPurchases / parseInt(limit)),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
