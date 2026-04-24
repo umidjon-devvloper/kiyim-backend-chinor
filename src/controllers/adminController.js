@@ -220,68 +220,98 @@ export const deactivateUserAccount = async (req, res, next) => {
 
 export const getPendingActivations = async (req, res, next) => {
   try {
-    const { page = 1, limit = 20, type } = req.query;
+    const { page = 1, limit = 20, type, search } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    const filter = { paymeState: 1 };
-    
-    if (type === "subscription") {
-      const Subscription = (await import("../models/Subscription.js")).default;
-      const pendingSubscriptions = await Subscription.find({ paymeState: 1 })
+    // Get all users with pending subscriptions or purchases
+    const matchFilter = {};
+    if (type === "purchase") {
+      matchFilter.paymeState = 1;
+      matchFilter.pattern = { $exists: true };
+    } else if (type === "subscription") {
+      matchFilter.paymeState = 1;
+      matchFilter.plan = { $exists: true };
+    } else {
+      matchFilter.paymeState = 1;
+    }
+
+    if (search) {
+      const users = await User.find({
+        $or: [
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+        ],
+      }).select("_id");
+      
+      matchFilter.user = { $in: users.map(u => u._id) };
+    }
+
+    // Get pending subscriptions
+    const [pendingSubscriptions, totalSubscriptions] = await Promise.all([
+      UserSubscription.find({ paymeState: 1 })
         .populate("user", "name email avatar")
         .populate("plan", "name price duration")
         .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit));
+        .skip(type === "purchase" ? 0 : skip)
+        .limit(type === "purchase" ? 0 : parseInt(limit)),
+      UserSubscription.countDocuments({ paymeState: 1 }),
+    ]);
 
-      const totalSubscriptions = await Subscription.countDocuments({ paymeState: 1 });
-
-      return successResponse(res, {
-        activations: pendingSubscriptions.map(sub => ({
-          _id: sub._id,
-          type: "subscription",
-          user: sub.user,
-          plan: sub.plan,
-          amount: sub.amount,
-          paymeTransactionId: sub.paymeTransactionId,
-          createdAt: sub.createdAt
-        })),
-        pagination: {
-          total: totalSubscriptions,
-          page: parseInt(page),
-          limit: parseInt(limit),
-          pages: Math.ceil(totalSubscriptions / parseInt(limit)),
-        },
-      });
-    }
-
-    const [purchases, totalPurchases] = await Promise.all([
-      Purchase.find(filter)
+    // Get pending purchases
+    const [pendingPurchases, totalPurchases] = await Promise.all([
+      Purchase.find({ paymeState: 1 })
         .populate("user", "name email avatar")
         .populate("pattern", "title previewImage type price")
         .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(parseInt(limit)),
-      Purchase.countDocuments(filter),
+        .skip(type === "subscription" ? 0 : skip)
+        .limit(type === "subscription" ? 0 : parseInt(limit)),
+      Purchase.countDocuments({ paymeState: 1 }),
     ]);
 
-    const activations = purchases.map(purchase => ({
-      _id: purchase._id,
-      type: "purchase",
-      user: purchase.user,
-      pattern: purchase.pattern,
-      amount: purchase.amount,
-      paymeTransactionId: purchase.paymeTransactionId,
-      createdAt: purchase.createdAt
-    }));
+    // Combine and format
+    let activations = [];
+    
+    if (type !== "purchase") {
+      activations = activations.concat(pendingSubscriptions.map(sub => ({
+        _id: sub._id,
+        type: "subscription",
+        user: sub.user,
+        plan: sub.plan,
+        amount: sub.amount,
+        paymeTransactionId: sub.paymeTransactionId,
+        startDate: sub.startDate,
+        endDate: sub.endDate,
+        createdAt: sub.createdAt
+      })));
+    }
+    
+    if (type !== "subscription") {
+      activations = activations.concat(pendingPurchases.map(purchase => ({
+        _id: purchase._id,
+        type: "purchase",
+        user: purchase.user,
+        pattern: purchase.pattern,
+        amount: purchase.amount,
+        paymeTransactionId: purchase.paymeTransactionId,
+        createdAt: purchase.createdAt
+      })));
+    }
+
+    // Sort by date
+    activations.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    const total = type === "purchase" ? totalPurchases : type === "subscription" ? totalSubscriptions : totalPurchases + totalSubscriptions;
+
+    // Apply pagination for combined results
+    const paginatedActivations = activations.slice(skip, skip + parseInt(limit));
 
     return successResponse(res, {
-      activations,
+      activations: paginatedActivations,
       pagination: {
-        total: totalPurchases,
+        total,
         page: parseInt(page),
         limit: parseInt(limit),
-        pages: Math.ceil(totalPurchases / parseInt(limit)),
+        pages: Math.ceil(total / parseInt(limit)),
       },
     });
   } catch (error) {
