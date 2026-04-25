@@ -82,12 +82,18 @@ export const getMySubscription = async (req, res, next) => {
 
     // Agar aktiv obuna bo'lsa, uni qaytaramiz
     if (activeSub) {
+      const timeDiff = new Date(activeSub.endDate) - now;
+      const daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      const hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      
       return successResponse(res, {
         hasSubscription: true,
         subscription: activeSub,
-        daysLeft: Math.ceil(
-          (new Date(activeSub.endDate) - now) / (1000 * 60 * 60 * 24),
-        ),
+        daysLeft,
+        hoursLeft,
+        minutesLeft,
+        activationType: "subscription", // Payme orqali
         pendingSubscription: null,
       });
     }
@@ -105,6 +111,9 @@ export const getMySubscription = async (req, res, next) => {
       hasSubscription: false,
       subscription: null,
       daysLeft: 0,
+      hoursLeft: 0,
+      minutesLeft: 0,
+      activationType: null,
       pendingSubscription: pendingSub
         ? {
             _id: pendingSub._id.toString(),

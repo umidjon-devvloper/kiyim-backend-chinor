@@ -1,8 +1,12 @@
-import admin from "firebase-admin";
+import { Expo } from 'expo-server-sdk';
 import User from "../models/User.js";
+import { UserSubscription } from "../models/Subscription.js";
+
+// Create Expo SDK instance
+const expo = new Expo();
 
 /**
- * Send push notification to a single user
+ * Send push notification to a single user using Expo Push API
  */
 export const sendToUser = async (userId, title, body, data = {}) => {
   try {
@@ -11,36 +15,27 @@ export const sendToUser = async (userId, title, body, data = {}) => {
       return { success: false, reason: "User not found or notifications disabled" };
     }
 
+    // Check if it's a valid Expo push token
+    if (!Expo.isExpoPushToken(user.fcmToken)) {
+      console.error(`Invalid Expo push token: ${user.fcmToken}`);
+      return { success: false, reason: "Invalid push token" };
+    }
+
     const message = {
-      notification: {
-        title,
-        body,
-      },
+      to: user.fcmToken,
+      sound: 'default',
+      title,
+      body,
       data: {
         type: data.type || "general",
         patternId: data.patternId || "",
         ...data,
       },
-      token: user.fcmToken,
-      android: {
-        priority: "high",
-        notification: {
-          channelId: "patterns",
-        },
-      },
-      apns: {
-        payload: {
-          aps: {
-            sound: "default",
-            badge: 1,
-          },
-        },
-      },
     };
 
-    const response = await admin.messaging().send(message);
-    console.log("✅ Notification sent to user:", userId);
-    return { success: true, messageId: response };
+    const ticket = await expo.sendPushNotificationsAsync([message]);
+    console.log("✅ Notification sent to user:", userId, ticket);
+    return { success: true, ticket };
   } catch (error) {
     console.error("❌ Error sending notification to user:", error.message);
     return { success: false, error: error.message };
@@ -48,7 +43,7 @@ export const sendToUser = async (userId, title, body, data = {}) => {
 };
 
 /**
- * Send push notification to multiple users
+ * Send push notification to multiple users using Expo Push API
  */
 export const sendToMultiple = async (userIds, title, body, data = {}) => {
   try {
@@ -59,59 +54,75 @@ export const sendToMultiple = async (userIds, title, body, data = {}) => {
     });
 
     if (users.length === 0) {
-      return { success: 0, failure: 0, reason: "No users with FCM tokens" };
+      return { success: 0, failure: 0, reason: "No users with push tokens" };
     }
 
-    const message = {
-      notification: {
-        title,
-        body,
-      },
-      data: {
-        type: data.type || "general",
-        patternId: data.patternId || "",
-        ...data,
-      },
-      tokens: users.map(u => u.fcmToken),
-      android: {
-        priority: "high",
-        notification: {
-          channelId: "patterns",
-        },
-      },
-      apns: {
-        payload: {
-          aps: {
-            sound: "default",
+    // Filter valid Expo push tokens
+    const messages = [];
+    const userMap = new Map();
+
+    users.forEach(user => {
+      if (Expo.isExpoPushToken(user.fcmToken)) {
+        messages.push({
+          to: user.fcmToken,
+          sound: 'default',
+          title,
+          body,
+          data: {
+            type: data.type || "general",
+            patternId: data.patternId || "",
+            ...data,
           },
-        },
-      },
-    };
+        });
+        userMap.set(user.fcmToken, user._id);
+      } else {
+        console.warn(`Invalid Expo push token for user ${user._id}: ${user.fcmToken}`);
+      }
+    });
 
-    const response = await admin.messaging().sendEachForMulticast(message);
-    
-    console.log(`✅ Notifications sent: ${response.successCount} success, ${response.failureCount} failure`);
-    
-    // Remove invalid tokens
-    if (response.failureCount > 0) {
-      const invalidTokens = [];
-      response.responses.forEach((resp, idx) => {
-        if (!resp.success) {
-          invalidTokens.push(users[idx].fcmToken);
-        }
-      });
+    if (messages.length === 0) {
+      return { success: 0, failure: 0, reason: "No valid Expo push tokens" };
+    }
 
-      if (invalidTokens.length > 0) {
-        await User.updateMany(
-          { fcmToken: { $in: invalidTokens } },
-          { $unset: { fcmToken: 1 } }
-        );
+    // Send in chunks (Expo recommends max 100 per request)
+    const chunks = expo.chunkPushNotifications(messages);
+    const tickets = [];
+
+    for (const chunk of chunks) {
+      try {
+        const ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+        tickets.push(...ticketChunk);
+      } catch (error) {
+        console.error("❌ Error sending push notification chunk:", error);
       }
     }
 
+    // Check for errors in tickets
+    let successCount = 0;
+    let failureCount = 0;
+
+    tickets.forEach((ticket, idx) => {
+      if (ticket.status === 'ok') {
+        successCount++;
+      } else {
+        failureCount++;
+        console.error(`❌ Failed to send to ${messages[idx].to}:`, ticket.details);
+        
+        // Remove invalid tokens
+        if (ticket.details && ticket.details.error === 'DeviceNotRegistered') {
+          const userId = userMap.get(messages[idx].to);
+          if (userId) {
+            User.findByIdAndUpdate(userId, { $unset: { fcmToken: 1 } }).catch(console.error);
+          }
+        }
+      }
+    });
+
+    console.log(`✅ Notifications sent: ${successCount} success, ${failureCount} failure`);
+    
     return {
-      success: response.successCount,
-      failure: response.failureCount,
+      success: successCount,
+      failure: failureCount,
     };
   } catch (error) {
     console.error("❌ Error sending notifications:", error.message);
@@ -199,4 +210,90 @@ export const toggleNotifications = async (userId, enabled) => {
     console.error("❌ Error toggling notifications:", error.message);
     return { success: false, error: error.message };
   }
+};
+
+/**
+ * Check and send notifications for expiring subscriptions
+ * Run this every 5-10 minutes
+ */
+export const checkExpiringSubscriptions = async () => {
+  try {
+    console.log("🔍 Checking for expiring subscriptions...");
+    
+    const now = new Date();
+    const fiveDaysFromNow = new Date(now.getTime() + (5 * 24 * 60 * 60 * 1000));
+    
+    // Find subscriptions expiring in next 5 days
+    const expiringSubs = await UserSubscription.find({
+      paymeState: 2,
+      endDate: { $gt: now, $lte: fiveDaysFromNow },
+      isActive: true,
+    }).populate('user');
+
+    if (expiringSubs.length === 0) {
+      console.log("✅ No expiring subscriptions found");
+      return { checked: 0, notified: 0 };
+    }
+
+    console.log(`⚠️ Found ${expiringSubs.length} expiring subscriptions`);
+
+    let notified = 0;
+
+    for (const sub of expiringSubs) {
+      const user = sub.user;
+      if (!user || !user.fcmToken || !user.notificationsEnabled) {
+        continue;
+      }
+
+      const daysLeft = Math.ceil((sub.endDate - now) / (1000 * 60 * 60 * 24));
+      
+      let title, body;
+      
+      if (daysLeft <= 1) {
+        title = "⏰ Obuna deyarli tugadi!";
+        body = `Sizning obunangiz ${daysLeft === 0 ? 'bugun' : 'ertaga'} tugaydi. Hoziroq yangilang!`;
+      } else if (daysLeft <= 3) {
+        title = "⚠️ Obuna yaqinlashmoqda";
+        body = `Sizning obunangiz ${daysLeft} kundan keyin tugaydi. Vaqtida yangilang!`;
+      } else {
+        title = "📅 Obuna eslatmasi";
+        body = `Sizning obunangiz ${daysLeft} kundan keyin tugaydi. Oldindan rejalashtiring!`;
+      }
+
+      const result = await sendToUser(user._id, title, body, {
+        type: 'subscription_expiring',
+        subscriptionId: sub._id.toString(),
+        daysLeft: daysLeft.toString(),
+      });
+
+      if (result.success) {
+        notified++;
+        console.log(`✅ Notified ${user.email} - ${daysLeft} days left`);
+      }
+    }
+
+    console.log(`✅ Checked ${expiringSubs.length} subscriptions, notified ${notified} users`);
+    return { checked: expiringSubs.length, notified };
+  } catch (error) {
+    console.error("❌ Error checking expiring subscriptions:", error.message);
+    return { checked: 0, notified: 0, error: error.message };
+  }
+};
+
+/**
+ * Start periodic notification checker
+ * Call this once when server starts
+ */
+export const startPeriodicNotificationChecker = (intervalMinutes = 5) => {
+  const intervalMs = intervalMinutes * 60 * 1000;
+  
+  console.log(`🔄 Starting periodic notification checker (every ${intervalMinutes} minutes)`);
+  
+  // Run immediately on start
+  checkExpiringSubscriptions().catch(console.error);
+  
+  // Then run periodically
+  setInterval(() => {
+    checkExpiringSubscriptions().catch(console.error);
+  }, intervalMs);
 };

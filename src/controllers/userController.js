@@ -47,10 +47,17 @@ export const getMySubscription = async (req, res, next) => {
     
     let subscriptionData = null;
     let daysLeft = 0;
+    let hoursLeft = 0;
+    let minutesLeft = 0;
+    let activationType = null;
     
     if (activeSub) {
       subscriptionData = activeSub;
-      daysLeft = Math.ceil((new Date(activeSub.endDate) - now) / (1000 * 60 * 60 * 24));
+      const timeDiff = new Date(activeSub.endDate) - now;
+      daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      activationType = "subscription"; // Payme orqali sotib olingan
     } else if (isPremium && req.user.premiumExpiresAt) {
       // Manual premium
       subscriptionData = {
@@ -59,7 +66,11 @@ export const getMySubscription = async (req, res, next) => {
         endDate: req.user.premiumExpiresAt,
         activationType: "manual",
       };
-      daysLeft = Math.ceil((new Date(req.user.premiumExpiresAt) - now) / (1000 * 60 * 60 * 24));
+      const timeDiff = new Date(req.user.premiumExpiresAt) - now;
+      daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      activationType = req.user.activationType || "manual";
     }
 
     return successResponse(res, {
@@ -67,6 +78,9 @@ export const getMySubscription = async (req, res, next) => {
       isPremium: hasActive,
       subscription: subscriptionData,
       daysLeft,
+      hoursLeft,
+      minutesLeft,
+      activationType,
       premiumExpiresAt: isPremium ? req.user.premiumExpiresAt : null,
     });
   } catch (error) { next(error); }
