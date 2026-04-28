@@ -26,7 +26,7 @@ export const googleLogin = async (req, res, next) => {
         401,
       );
     }
-
+    
     const { uid, email, name, picture } = firebaseUser;
 
     if (!email) {
