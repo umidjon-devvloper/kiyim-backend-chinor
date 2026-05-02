@@ -7,6 +7,7 @@ import {
   getFavorites,
   addFavorite,
   removeFavorite,
+  removeUser,
 } from "../controllers/userController.js";
 import {
   updateFCMTokenController,
@@ -26,7 +27,7 @@ router.get("/subscription/history", getSubscriptionHistory);
 router.get("/favorites", getFavorites);
 router.post("/favorites/:patternId", addFavorite);
 router.delete("/favorites/:patternId", removeFavorite);
-
+router.delete("/profile/delete", removeUser);
 // Notification routes
 router.put("/fcm-token", updateFCMTokenController);
 router.put("/notifications/toggle", toggleNotificationsController);

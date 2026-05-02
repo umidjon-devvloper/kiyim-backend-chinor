@@ -32,43 +32,55 @@ export const updateProfile = async (req, res, next) => {
 export const getMySubscription = async (req, res, next) => {
   try {
     const now = new Date();
-    
+
     // Check UserSubscription
     const activeSub = await UserSubscription.findOne({
       user: req.user._id,
       paymeState: 2,
       endDate: { $gt: now },
-    }).populate("plan").sort({ endDate: -1 });
+    })
+      .populate("plan")
+      .sort({ endDate: -1 });
 
     // Check manual premium activation
-    const isPremium = req.user.isPremium && req.user.premiumExpiresAt && new Date(req.user.premiumExpiresAt) > now;
-    
+    const isPremium =
+      req.user.isPremium &&
+      req.user.premiumExpiresAt &&
+      new Date(req.user.premiumExpiresAt) > now;
+
     const hasActive = !!activeSub || isPremium;
-    
+
     let subscriptionData = null;
     let daysLeft = 0;
     let hoursLeft = 0;
     let minutesLeft = 0;
     let activationType = null;
-    
+
     if (activeSub) {
       subscriptionData = activeSub;
       const timeDiff = new Date(activeSub.endDate) - now;
       daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-      hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      hoursLeft = Math.floor(
+        (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+      );
       minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
       activationType = "subscription"; // Payme orqali sotib olingan
     } else if (isPremium && req.user.premiumExpiresAt) {
       // Manual premium
       subscriptionData = {
-        plan: { name: "Qo'lda aktivlashtirilgan", duration: req.user.premiumDuration },
+        plan: {
+          name: "Qo'lda aktivlashtirilgan",
+          duration: req.user.premiumDuration,
+        },
         startDate: req.user.premiumActivatedAt,
         endDate: req.user.premiumExpiresAt,
         activationType: "manual",
       };
       const timeDiff = new Date(req.user.premiumExpiresAt) - now;
       daysLeft = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
-      hoursLeft = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      hoursLeft = Math.floor(
+        (timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+      );
       minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
       activationType = req.user.activationType || "manual";
     }
@@ -83,7 +95,9 @@ export const getMySubscription = async (req, res, next) => {
       activationType,
       premiumExpiresAt: isPremium ? req.user.premiumExpiresAt : null,
     });
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getSubscriptionHistory = async (req, res, next) => {
@@ -100,9 +114,16 @@ export const getSubscriptionHistory = async (req, res, next) => {
     ]);
     return successResponse(res, {
       subscriptions: subs,
-      pagination: { total, page: parseInt(page), limit: parseInt(limit), pages: Math.ceil(total / parseInt(limit)) },
+      pagination: {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        pages: Math.ceil(total / parseInt(limit)),
+      },
     });
-  } catch (error) { next(error); }
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const getFavorites = async (req, res, next) => {
@@ -175,6 +196,15 @@ export const removeFavorite = async (req, res, next) => {
     }
 
     return successResponse(res, null, "Sevimlilardan o'chirildi");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeUser = async (req, res, next) => {
+  try {
+    await User.findByIdAndDelete(req.user._id);
+    return successResponse(res, null, "Foydalanuvchi o'chirildi");
   } catch (error) {
     next(error);
   }
